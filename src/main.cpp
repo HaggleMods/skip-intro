@@ -2,29 +2,28 @@
 #include <callbacks/callbacks.hpp>
 #include <MinHook.h>
 
+HMODULE self{};
+
 void init()
 {
 	MH_Initialize();
 
-
-	//Some useful callbacks
-	//Check out callbacks.hpp for more!
-
-
-	callbacks::on(callbacks::type::begin_turn_2, []()
-	{
-	});
-
-	callbacks::on(callbacks::type::do_level_done, []()
-	{
-	});
-
-	callbacks::on(callbacks::type::do_to_menu, []()
-	{
-	});
-
 	callbacks::on(callbacks::type::main_loop, []()
 	{
+		static bool once = false;
+		if (!once)
+		{
+			static int timer = 100;
+			if (timer > 0)
+			{
+				--timer;
+			}
+			else if (timer <= 0)
+			{
+				Sexy::ThunderballApp::DoToMenu();
+				once = true;
+			}
+		}
 	});
 
 	MH_EnableHook(MH_ALL_HOOKS);
@@ -55,8 +54,9 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		DisableThreadLibraryCalls(hModule);
-		CreateThread(nullptr, 0, OnAttach, hModule, 0, nullptr);
+		self = hModule;
+		DisableThreadLibraryCalls(self);
+		CreateThread(nullptr, 0, OnAttach, self, 0, nullptr);
 		return true;
 	}
 

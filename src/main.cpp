@@ -7,7 +7,7 @@ HMODULE self{};
 void init()
 {
 	MH_Initialize();
-
+	//Very much temporary solution; side effect I found during CrowdControl testing
 	callbacks::on(callbacks::type::main_loop, []()
 	{
 		static bool once = false;
